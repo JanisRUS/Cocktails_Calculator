@@ -1,0 +1,10 @@
+release/F_Cocktail.o
+release/F_Ingredient.o
+release/F_Ingredient_DB.o
+release/F_Main.o
+release/main.o
+release/qrc_Recources.o
+release/moc_F_Cocktail.o
+release/moc_F_Ingredient.o
+release/moc_F_Ingredient_DB.o
+release/moc_F_Main.o

@@ -1,0 +1,10 @@
+debug/F_Cocktail.o
+debug/F_Ingredient.o
+debug/F_Ingredient_DB.o
+debug/F_Main.o
+debug/main.o
+debug/qrc_Recources.o
+debug/moc_F_Cocktail.o
+debug/moc_F_Ingredient.o
+debug/moc_F_Ingredient_DB.o
+debug/moc_F_Main.o

@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/Icons">
+        <file>Icons/Add_Icon.png</file>
+        <file>Icons/Cocktail_Icon.png</file>
+        <file>Icons/Delete_Icon.png</file>
+        <file>Icons/Accept_Icon.png</file>
+        <file>Icons/Acepted_Icon.png</file>
+    </qresource>
+</RCC>
