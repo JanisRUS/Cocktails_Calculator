@@ -22,13 +22,17 @@ F_Main::F_Main(QWidget *Parent) : QMainWindow(Parent), Form(new Ui::F_Main)
     {
         // Назначить обработчик изменения данных о коктейле
         connect(Cocktails_Data.Forms[i], &F_Cocktail::Edited_Signal, this, &F_Main::Cocktail_Edited);
+        // Назначить обработчик удаления коктейля
+        connect(Cocktails_Data.Forms[i], &F_Cocktail::Delete_Signal, this, &F_Main::Cocktail_Deteled);
     }
 
     // Для всего списка ингредиентов
     for (int i = 0; i < Ingredients_Data.Data.length(); i++)
     {
-        // Метод обработки изменения данных об ингредиенте
+        // Назначить обработчик изменения данных об ингредиенте
         connect(Ingredients_Data.Forms[i], &F_Ingredient_DB::Edited_Signal, this, &F_Main::Ingredient_Edited);
+        // Назначить обработчик изменения данных об ингредиенте
+        connect(Ingredients_Data.Forms[i], &F_Ingredient_DB::Delete_Signal, this, &F_Main::Ingredient_Deteled);
     }
 }
 
@@ -144,6 +148,13 @@ void F_Main::Update_Cocktails_Data()
         int Volume = 0;
         // Процент алкоголя
         int Alcohol = 0;
+
+        // Если данные коктейля некорректны
+        if (!Cocktails_Data.Forms[i]->Validate_Data_Current())
+        {
+            // Продолжить выполнение цикла
+            continue;
+        }
 
         // Для всех ингредиентов коктейля
         for (int j = 0; j < Cocktails_Data.Data[i].Ingredients_Count; j++)
@@ -290,7 +301,15 @@ void F_Main::Add_Cocktail_Button_Clicked()
     // Создать форму коктейля
     Cocktails_Data.Forms.append(new F_Cocktail());
     // Создать данные коктейля
-    Cocktails_Data.Data.append(QList<Cocktail_Data_Struct>());
+    Cocktails_Data.Data.append
+    (
+        {
+            "",
+            0,
+            QList<Ingredient_Data_Struct>(),
+            QList<F_Ingredient *>()
+        }
+    );
     // Заполнить данные коктейля
     Cocktails_Data.Data.last() =
     {
@@ -305,6 +324,8 @@ void F_Main::Add_Cocktail_Button_Clicked()
     Cocktails_Data.Layout->addWidget(Cocktails_Data.Forms.last());
     // Назначить обработчик изменения данных о коктейле
     connect(Cocktails_Data.Forms.last(), &F_Cocktail::Edited_Signal, this, &F_Main::Cocktail_Edited);
+    // Назначить обработчик удаления коктейля
+    connect(Cocktails_Data.Forms.last(), &F_Cocktail::Delete_Signal, this, &F_Main::Cocktail_Deteled);
 }
 
 // Метод обработки нажатия на кнопку добавления ингредиента
@@ -320,8 +341,10 @@ void F_Main::Add_Ingredient_Button_Clicked()
     Ingredients_Data.Layout->addWidget(Ingredients_Data.Forms.last());
     // Записать название ингредиента
     Ingredients_List_Inner.append(Ingredients_Data.Data.last().Name);
-    // Метод обработки изменения данных об ингредиенте
+    // Назначить обработчик изменения данных об ингредиенте
     connect(Ingredients_Data.Forms.last(), &F_Ingredient_DB::Edited_Signal, this, &F_Main::Ingredient_Edited);
+    // Назначить обработчик удаления ингредиента
+    connect(Ingredients_Data.Forms.last(), &F_Ingredient_DB::Delete_Signal, this, &F_Main::Ingredient_Deteled);
 }
 
 // Метод обработки изменения данных о коктейле
@@ -358,6 +381,8 @@ void F_Main::Ingredient_Edited(QString Ingredient_Name)
     // Для всего списка коктейлей
     for (int i = 0; i < Cocktails_Data.Data.length(); i++)
     {
+        // Обновить данные коктейля
+        Cocktails_Data.Forms[i]->Validate_Data_Current();
         // Для всего списка ингредиентов
         for (int j = 0; j < Cocktails_Data.Data[i].Ingredients_Data.length(); j++)
         {
@@ -382,11 +407,61 @@ void F_Main::Ingredient_Edited(QString Ingredient_Name)
 // Метод обработки удаления коктейля
 void F_Main::Cocktail_Deteled(QString Cocktail_Name)
 {
-
+    // Для всего списка коктейлей
+    for (int i = 0; i < Cocktails_Data.Data.length(); i++)
+    {
+        // Если найден коктейль, который необходимо удалить
+        if (Cocktails_Data.Data[i].Name == Cocktail_Name)
+        {
+            // Сбросить обработчик изменения данных коктейля
+            disconnect(Cocktails_Data.Forms[i], &F_Cocktail::Edited_Signal, this, &F_Main::Cocktail_Edited);
+            // Сбросить обработчик удаления коктейля
+            disconnect(Cocktails_Data.Forms[i], &F_Cocktail::Delete_Signal, this, &F_Main::Cocktail_Deteled);
+            // Удалить форму коктейля
+            delete Cocktails_Data.Forms[i];
+            // Удалить форму коктейля
+            Cocktails_Data.Forms.removeAt(i);
+            // Удалить данные коктейля
+            Cocktails_Data.Data.removeAt(i);
+        }
+    }
+    // Записать данные об ингредиентах в файл
+    Write_Ingredients_To_File();
+    // Записать данные о коктейлях в файл
+    Write_Cocktails_To_File();
 }
 
 // Метод обработки удаления ингредиента
 void F_Main::Ingredient_Deteled(QString Ingredient_Name)
 {
-
+    // Для всего списка ингредиентов
+    for (int i = 0; i < Ingredients_Data.Data.length(); i++)
+    {
+        // Если найден ингредиент, который необходимо удалить
+        if (Ingredients_Data.Data[i].Name == Ingredient_Name)
+        {
+            // Сбросить обработчик изменения данных ингредиента
+            disconnect(Ingredients_Data.Forms[i], &F_Ingredient_DB::Edited_Signal, this, &F_Main::Ingredient_Edited);
+            // Сбросить обработчик удаления ингредиента
+            disconnect(Ingredients_Data.Forms[i], &F_Ingredient_DB::Delete_Signal, this, &F_Main::Ingredient_Deteled);
+            // Удалить форму ингредиента
+            delete Ingredients_Data.Forms[i];
+            // Удалить форму ингредиента
+            Ingredients_Data.Forms.removeAt(i);
+            // Удалить данные ингредиента
+            Ingredients_Data.Data.removeAt(i);
+            // Удалить ингредиент из списка ингредиентов
+            Ingredients_List_Inner.removeAt(i);
+        }
+    }
+    // Для всего списка коктейлей
+    for (int i = 0; i < Cocktails_Data.Data.length(); i++)
+    {
+        // Обновить данные коктейля
+        Cocktails_Data.Forms[i]->Validate_Data_Current();
+    }
+    // Записать данные об ингредиентах в файл
+    Write_Ingredients_To_File();
+    // Записать данные о коктейлях в файл
+    Write_Cocktails_To_File();
 }

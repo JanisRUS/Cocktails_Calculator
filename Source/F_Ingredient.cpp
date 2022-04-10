@@ -7,9 +7,9 @@ F_Ingredient::F_Ingredient(QWidget *Parent) : QWidget(Parent), Form(new Ui::F_In
     // Настроить Ui формы
     Form->setupUi(this);
     // Назначить обработчик редактирования названия ингредиента
-    connect(Form->Name_TBox,     &QLineEdit::textEdited,      this, &F_Ingredient::TBox_Changed);
+    connect(Form->Name_TBox,     &QLineEdit::textChanged,     this, &F_Ingredient::TBox_Changed);
     // Назначить обработчик редактирования объема ингредиента
-    connect(Form->Volume_TBox,   &QLineEdit::textEdited,      this, &F_Ingredient::TBox_Changed);
+    connect(Form->Volume_TBox,   &QLineEdit::textChanged,     this, &F_Ingredient::TBox_Changed);
     // Назначить обработчик нажатия на кнопку удаления ингредиента
     connect(Form->Delete_Button, &QPushButton::clicked,       this, &F_Ingredient::Delete_Button_Clicked);
     // Назначить обработчик завершения редактирования данных об ингредиенте

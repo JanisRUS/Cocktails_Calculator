@@ -50,6 +50,14 @@ void F_Cocktail::Set_Data(Cocktail_Data_Struct *Data_Ptr_New, QStringList *Ingre
         // Назначить обработчик изменения ингредиента
         connect(Data_Ptr->Forms[i], &F_Ingredient::Edited_Signal, this, &F_Cocktail::Ingredient_Edited);
     }
+    // Очистить список ингредиентов коктейля
+    Cocktail_Ingredients_List.clear();
+    // Для всех ингредиентов коктейля
+    for (int i = 0; i < Data_Ptr->Forms.length(); i++)
+    {
+        // Добавить ингредиент в список
+        Cocktail_Ingredients_List.append(Data_Ptr->Ingredients_Data[i].Name);
+    }
 
     // Обновить текущие данные коктейля
     Update_Data_Current();
@@ -95,6 +103,12 @@ void F_Cocktail::Update_Data_Current()
     // Для всех ингредиентов коктейля
     for (int i = 0; i < Data_Ptr->Ingredients_Data.length(); i++)
     {
+        // Если позиция в списке ингредиент коктейля отсутствует
+        if (i >= Cocktail_Ingredients_List.length())
+        {
+            // Прервать выполнение цикла
+            break;
+        }
         // Если ингредиент отличается
         if (Data_Ptr->Ingredients_Data[i].Name != Cocktail_Ingredients_List[i])
         {
@@ -250,6 +264,8 @@ void F_Cocktail::Ingredient_Deteled(QString Ingredient_Name)
             disconnect(Data_Ptr->Forms.last(), &F_Ingredient::Edited_Signal, this, &F_Cocktail::Ingredient_Edited);
             // Удалить форму ингредиента
             delete Data_Ptr->Forms[i];
+            // Удалить форму ингредиента
+            Data_Ptr->Forms.removeAt(i);
             // Удалить данные ингредиента
             Data_Ptr->Ingredients_Data.removeAt(i);
             // Уменьшить количество ингредиентов

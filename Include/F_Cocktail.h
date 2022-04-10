@@ -101,6 +101,14 @@ public:
     bool Check_Data();
 
     /*!
+        @fn      bool Validate_Data_Current()
+        @brief   Метод валидации текущих данных коктейля
+        @details Данный метод выполняет валидацию текущих данных коктейля и подсветку полей с некорректными данными
+        @return  Возвращает true в случае, если текущие данные коктейля корректны. В противном случае, возвращает false
+    */
+    bool Validate_Data_Current();
+
+    /*!
         @fn       static QList<Cocktail_Info_Struct> Read_Cocktails_From_File(QString File_Path)
         @brief    Статический метод чтения данных о коктейлях из файла
         @details  Данный метод выполняет чтение данных о коктейлях из указанного файла и их валидацию.<br>
@@ -168,14 +176,6 @@ private:
         @return  None
     */
     void Update_Data_Current();
-
-    /*!
-        @fn      bool Validate_Data_Current()
-        @brief   Метод валидации текущих данных коктейля
-        @details Данный метод выполняет валидацию текущих данных коктейля и подсветку полей с некорректными данными
-        @return  Возвращает true в случае, если текущие данные коктейля корректны. В противном случае, возвращает false
-    */
-    bool Validate_Data_Current();
 
     /*!
         @fn      void Change_Is_Changed(bool New_State)
